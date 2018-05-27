@@ -5,8 +5,42 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CSProfiles"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="CSProfiles" HorizontalAlignment="Left" VerticalAlignment="Top" Width="600" Height="600" MinWidth="600" MinHeight="600">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+            <ComboBox Margin="5" VerticalAlignment="Top" MinWidth="80" Name="normeCB" DisplayMemberPath="normeName"/>
+            <ComboBox Margin="5" VerticalAlignment="Top" MinWidth="80" Name="familyCB" DisplayMemberPath="profileName"/>
+            <ComboBox Margin="5" Width="Auto" VerticalAlignment="Top" MinWidth="90" Name="profilesCB" DisplayMemberPath="profileName"/>
+        </StackPanel>
+        <ListView Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="5" Padding="5" Name="paramProfilesLV">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Parametr" DisplayMemberBinding="{Binding paramName}" />
+                    <GridViewColumn Header="Value" DisplayMemberBinding="{Binding paramValue}" />
+                    <GridViewColumn Header="Unit"  DisplayMemberBinding="{Binding paramUnit}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <GroupBox Grid.Column="2" Grid.Row="3" Header="DXF Options" Margin="0,5,5,5" VerticalContentAlignment="Bottom">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Margin="5" IsChecked="True">Front view</CheckBox>
+                    <CheckBox Margin="5" IsChecked="True">Top view</CheckBox>
+                    <CheckBox Margin="5" IsChecked="True">Side view</CheckBox>
+                </StackPanel>
+                <Button Content="Open dxf"  Padding="3" Margin="5"/>
+                <Button Content="Save dxf"  Padding="3" Margin="5"/>
+            </StackPanel>
+        </GroupBox>
+        <Image Grid.Column="1" Margin="0,5,5,5" Grid.Row="1"/>
     </Grid>
 </Window>

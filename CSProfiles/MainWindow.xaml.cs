@@ -20,9 +20,26 @@ namespace CSProfiles
     /// </summary>
     public partial class MainWindow : Window
     {
+        public List<ProfilesNorme> normeList;
+        public List<ProfilesFamily> familyList;
+        public List<Profiles> profilesList;
+        public List<ProfileItem> ListViewData;
+        
         public MainWindow()
         {
             InitializeComponent();
+
+            // test 
+            ListViewData = new List<ProfileItem>();
+            ListViewData.Add(new ProfileItem("A", "123", "mm"));
+            normeList = new List<ProfilesNorme>() { new ProfilesNorme(1, "Eurocode", "EC") };
+
+            // binding ui controls to list
+            normeCB.ItemsSource = normeList;
+            familyCB.ItemsSource = familyList;
+            profilesCB.ItemsSource = profilesList;
+            paramProfilesLV.ItemsSource = ListViewData;
         }
+
     }
 }
