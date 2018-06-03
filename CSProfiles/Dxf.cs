@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace CSProfiles
 {
     // base class with drawing functons
@@ -36,14 +35,16 @@ namespace CSProfiles
                 "0", "TABLE","2","LAYER","70","6",
                     "0","LAYER","2",LayerContinue,"70","64","62","3","6","CJCONTINUOUS",
                     "0","LAYER","2",LayerHidden,"70","64","62","50","6","CJHIDDEN","0","ENDTAB",
-                "0","TABLE","2","STYLE","70","0","0","ENDTAB","0","ENDSEC",
+                "0","TABLE","2","STYLE","70","0","0","ENDTAB",
+                "0","TABLE","2","VPORT","70","1","0","VPORT","2","CSVIEV","70","0","12","1000","22","150","40","2000","41","2","0","ENDTAB",
+                "0","ENDSEC",
 				// end TABLES
 				"0", "SECTION", "2", "BLOCKS", "0", "ENDSEC",
                 "0", "SECTION", "2", "ENTITIES"
               };
-            for (int a = 0; a < header.Length; a++)
+            foreach (String line in header)
             {
-                dxfBody.Add(header[a]);
+                dxfBody.Add(line);
             }
         }
 
@@ -156,7 +157,7 @@ namespace CSProfiles
             if (Bulge != 0)
             {
                 dxfBody.Add("42");
-                dxfBody.Add(Bulge.ToString());
+                dxfBody.Add(Bulge.ToString().Replace(",","."));
             }
         }
 

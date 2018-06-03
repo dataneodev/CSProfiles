@@ -42,7 +42,7 @@
                     <GridViewColumn Width="auto" Header="Unit">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Width="Auto" Text="{Binding paramUnit}" TextAlignment="Left" />
+                                <TextBlock MinWidth="40" Width="Auto" Text="{Binding paramUnit}" TextAlignment="Left" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 namespace CSProfiles
@@ -32,12 +33,14 @@ namespace CSProfiles
         public String paramName { get; private set; }
         public String paramValue { get; private set; }
         public String paramUnit { get; private set; }
+        public TextBlock paramUnitTB { get; private set; }
 
-        public ProfileItem(string paramName, string paramValue, string paramUnit)
+        public ProfileItem(string paramName, string paramValue, string paramUnit, TextBlock paramUnitTB)
         {
             this.paramName = paramName;
             this.paramValue = paramValue;
             this.paramUnit = paramUnit;
+            this.paramUnitTB = paramUnitTB;
         }
     }
 
@@ -236,7 +239,10 @@ namespace CSProfiles
                             continue;
                         }
                         String unit = lineParam[2].Replace("m3", "m\x00B3").Replace("m2", "m\x00B2") ;
-                        listViewData.Add(new ProfileItem(lineParam[0], lineParam[1], unit));
+                        TextBlock unitTB = new TextBlock();
+                        unitTB.Inlines.Add("test");
+                       // unitTB.Inlines.Add(new System.Windows.Documents.Run("jednostka ") { BaselineAlignment = System.Windows.BaselineAlignment.Superscript });
+                        listViewData.Add(new ProfileItem(lineParam[0], lineParam[1], unit, unitTB));
                     }
                 }
             }

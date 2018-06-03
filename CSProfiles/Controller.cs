@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -13,6 +14,7 @@ namespace CSProfiles
         public const String ProgramName = "CJProfiles";
         public const float ProgramVersion = 1.0F;
         public const String DBName = "Profile.pdb";
+        public const String DXFFileExt = ".dxf";
 
         private readonly DBControl DB = new DBControl(DBName);
         private readonly Drawers D3D = new Drawers();
@@ -38,8 +40,8 @@ namespace CSProfiles
         /// <summary>
         /// Open DXF File
         /// </summary>
-        public void OpenDXFFile(Profiles selectedProfile, bool frontView, 
-            bool topView, bool sideView)
+        public void OpenDXFFile(Profiles selectedProfile, bool frontViewP, 
+            bool topViewP, bool sideViewP)
         {
             #if DEBUG
             Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -74,27 +76,120 @@ namespace CSProfiles
 
             if (!D3D.IsFamilyHasDxfDrawer(profileFamily))
             {
-                //MessageBox.Show("DXF for this profile is not possible",
-                //MVC.GetProgramName(),MessageBoxButton.OK, MessageBoxImage.Warning);
                 #if DEBUG
                 Log.Warning(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
                     "!D3D.IsFamilyHasDxfDrawer(profileFamily)");
                 #endif
                 return;
             }
+
+            String tempPath = Path.GetTempPath() + selectedProfile.profileName + "_" + GKCommon.GetUniqueKey(4).ToLower()+ 
+                                "_"+Controller.DXFFileExt;
+
+            if (!D3D.SaveDxfToFile(tempPath, profileFamily, new List<ProfileItem>(listViewData.ToList()),
+                new ViewOptions() { topView = topViewP, frontView = frontViewP, sideView = sideViewP }))
+            {
+                #if DEBUG
+                Log.Warning(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "!D3D.SaveDxfToFile");
+                #endif
+                return;
+            }
+            try
+            {
+                System.Diagnostics.Process.Start(tempPath);
+            }
+            catch(ObjectDisposedException e)
+            {
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "ObjectDisposedException : "+e.Message.ToString());
+                #endif
+            }
+            catch (FileNotFoundException e)
+            {
+            #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                        "FileNotFoundException : " + e.Message.ToString());
+            #endif
+            }
+            catch(System.ComponentModel.Win32Exception e)
+            {
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                        "System.ComponentModel.Win32Exception : " + e.Message.ToString());
+                #endif
+            }
         }
 
         /// <summary>
         /// Save DXF File
         /// </summary>
-        public void SaveDXFFile(Profiles selectedProfile, bool frontView,
-            bool topView, bool sideView)
+        public void SaveDXFFile(Profiles selectedProfile, bool frontViewP,
+            bool topViewP, bool sideViewP)
         {
             #if DEBUG
             Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
             #endif
 
+            if (selectedProfile == null)
+            {
+            #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "selectedProfile == null");
+            #endif
+                return;
+            }
 
+            ProfilesFamily profileFamily = null;
+            foreach (ProfilesFamily family in familyList)
+            {
+                if (family.id == selectedProfile.profileFamilyId)
+                {
+                    profileFamily = family;
+                }
+            }
+
+            if (profileFamily == null)
+            {
+            #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "profileFamily == null");
+            #endif
+                return;
+            }
+
+            if (!D3D.IsFamilyHasDxfDrawer(profileFamily))
+            {
+            #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "!D3D.IsFamilyHasDxfDrawer(profileFamily)");
+            #endif
+                return;
+            }
+
+            SaveFileDialog savefile = new SaveFileDialog();
+            savefile.FileName = selectedProfile.profileName + Controller.DXFFileExt;
+            savefile.Filter = "DXF Files ("+ Controller.DXFFileExt + ")|*" + Controller.DXFFileExt;
+
+            if (savefile.ShowDialog() == false)
+            {
+                #if DEBUG
+                Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "User canceled save dialog");
+                #endif
+                return;
+            }
+
+            if (!D3D.SaveDxfToFile(savefile.FileName, profileFamily, new List<ProfileItem>(listViewData.ToList()),
+                new ViewOptions() { topView = topViewP, frontView = frontViewP, sideView = sideViewP }))
+            {
+                #if DEBUG
+                Log.Warning(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                        "!D3D.SaveDxfToFile");
+                #endif
+                return;
+            }
         }
 
         /// <summary>
@@ -164,22 +259,24 @@ namespace CSProfiles
         private static List<string> logger = new List<string>();
         
         public static void Notice(String path, String msg)
-        { AddMsg("NOTICE " + path + (msg.Length > 0 ? " : " + msg : "") );  }
+        { AddMsg("NOTICE", path, msg);  }
         public static void Notice(String path)
         { Notice(path, ""); }
 
         public static void Warning(String path, String msg)
-        { AddMsg("WARNING " + path + (msg.Length > 0 ? " : " + msg : "")); }
-        public static void warning(String path)
+        { AddMsg("WARNING", path, msg); }
+        public static void Warning(String path)
         { Warning(path, ""); }
 
         public static void Error(String path, String msg)
-        { AddMsg("ERROR " + path + (msg.Length > 0 ? " : " + msg : "")); }
+        { AddMsg("ERROR", path, msg); }
         public static void Error(String path)
         { Error(path,""); }
 
-        private static void AddMsg(String msg)
-        { logger.Add(DateTime.Now.ToString() + " " + msg); }
+        private static void AddMsg(String msgType, String path, String msg)
+        {
+            String mm = msgType + " " + path + (msg.Length > 0 ? " : " + msg : "");
+            logger.Add(DateTime.Now.ToString() + " " + mm); }
 
         public static void SaveLog()
         {
@@ -223,6 +320,36 @@ namespace CSProfiles
                 if (!dir.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
                     dir += Path.AltDirectorySeparatorChar;
             return dir;
+        }
+        /// <summary>
+        /// Gets random string
+        /// </summary>
+        public static string GetUniqueKey(int maxSize)
+        {
+            char[] chars = new char[62];
+            chars =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
+            byte[] data = new byte[1];
+            using (System.Security.Cryptography.RNGCryptoServiceProvider crypto = 
+                new System.Security.Cryptography.RNGCryptoServiceProvider())
+            {
+                crypto.GetNonZeroBytes(data);
+                data = new byte[maxSize];
+                crypto.GetNonZeroBytes(data);
+            }
+            StringBuilder result = new StringBuilder(maxSize);
+            foreach (byte b in data)
+            {
+                result.Append(chars[b % (chars.Length)]);
+            }
+            return result.ToString();
+        }
+    }
+    static class Extensions
+    {
+        public static IList<T> Clone<T>(this IList<T> listToClone) where T : ICloneable
+        {
+            return listToClone.Select(item => (T)item.Clone()).ToList();
         }
     }
 }

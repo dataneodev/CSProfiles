@@ -9,21 +9,21 @@ namespace CSProfiles
 {
     public class Sections_H : IDxfDrawer
     {
-	    private ObservableCollection<ProfileItem> profileData;
+	    private List<ProfileItem> profileData;
         private int drawerId;
 
-        public void SetData(ObservableCollection<ProfileItem> profileItem, int darwerId)
+        public void SetData(List<ProfileItem> profileItem, int darwerId)
         {
-            this.profileData = profileItem;
+            this.profileData = new List<ProfileItem>(profileItem);
             this.drawerId = darwerId;
         }
 
         public String GetDxfBody(ViewOptions viewOptions)
         {
-     
             IHSectionCordinate Cor = null;
+            // cordinate
 		    switch(drawerId) {
-			    case 1:
+			    case 1: // Eurocode
 				    Cor = new HSectionCordinateEC();
                 break;
             }
@@ -34,17 +34,27 @@ namespace CSProfiles
                         "cordinate == null");
                 #endif
                 return "";
-                //throw new IllegalArgumentException("getDxfBody: cordinate == null");
             }
 
-            Cor.setProfilesProperties(profileData); // IllegalArgumentException
+            try
+            {
+                Cor.SetProfilesProperties(profileData); 
+            }
+            catch(ArgumentNullException e)
+            {
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "SetProfilesProperties: " + e.Message.ToString());
+                #endif
+                return "";
+            }
 
             Dxf dxfFile = new Dxf();
-            float B = Cor.getB();
-            float H = Cor.getH();
-            float tf = Cor.getTf();
-            float tw = Cor.getTw();
-            float r = Cor.getR();
+            float B = Cor.B;
+            float H = Cor.H;
+            float tf = Cor.Tf;
+            float tw = Cor.Tw;
+            float r = Cor.R;
 
 		     // section generate
 		    //top view
@@ -57,7 +67,7 @@ namespace CSProfiles
 			    dxfFile.polyLineAdd(B/2, tf, 0);
 			    dxfFile.polyLineAdd(tw/2+r, tf, buckleA);
 			    dxfFile.polyLineAdd(tw/2, tf+r, 0);
-			    dxfFile.polyLineAdd(tw/2, tf+r+Cor.getH1(), buckleA);
+			    dxfFile.polyLineAdd(tw/2, tf+r+Cor.H1, buckleA);
 			    dxfFile.polyLineAdd(tw/2+r, H-tf, 0);
 			    dxfFile.polyLineAdd(B/2, H-tf, 0);
 			    dxfFile.polyLineAdd(B/2, H, 0);
@@ -66,7 +76,7 @@ namespace CSProfiles
 			    dxfFile.polyLineAdd(-1* B/2, H, 0);
 			    dxfFile.polyLineAdd(-1* B/2, H-tf, 0);
 			    dxfFile.polyLineAdd(-1* (tw/2+r), H-tf, buckleA);
-			    dxfFile.polyLineAdd(-1* tw/2, tf+r+Cor.getH1(), 0);
+			    dxfFile.polyLineAdd(-1* tw/2, tf+r+Cor.H1, 0);
 			    dxfFile.polyLineAdd(-1* tw/2, tf+r, buckleA);
 			    dxfFile.polyLineAdd(-1* (tw/2+r), tf, 0);
 			    dxfFile.polyLineAdd(-1* B/2, tf, 0);
@@ -121,13 +131,13 @@ namespace CSProfiles
 	    }
     }
 
+    // Eurocode H Section cordinate
     public class HSectionCordinateEC : HSectionCordinateSource, IHSectionCordinate
     {
         public HSectionCordinateEC(){
             #if DEBUG
                 Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
             #endif
-            //  logger.fine("HSectionCordinateEC. Map definition");
             ParametrsMap = new List<HSectionMap>();
             ParametrsMap.Add(new HSectionMap(HSectionDim.h, "h", "mm"));
             ParametrsMap.Add(new HSectionMap(HSectionDim.b, "b", "mm"));
@@ -137,15 +147,16 @@ namespace CSProfiles
         }
     }
 
+    // base
     interface IHSectionCordinate
     {
-        void setProfilesProperties(ObservableCollection<ProfileItem> profile);
-        float getH();
-        float getB();
-        float getTf();
-        float getTw();
-        float getR();
-        float getH1();
+        void SetProfilesProperties(List<ProfileItem> profile);
+        float H { get; }
+        float B { get; }
+        float Tf { get; }
+        float Tw { get;}
+        float R { get; }
+        float H1 { get; }
     }
 
     public enum HSectionDim { h, b, tf, tw, r }
@@ -153,16 +164,16 @@ namespace CSProfiles
     public class HSectionMap
     {
         public HSectionDim dim;
-        public String dimNameFamily;
-        public String dimUnitFamily;
-        public bool dimExists;
+        public String dimName;
+        public String dimUnit;
         public float dimValue;
+        public bool dimExists;
 
-        public HSectionMap(HSectionDim dim, String dimNameFamily, String dimUnitFamily)
+        public HSectionMap(HSectionDim dim, String dimName, String dimUnit)
         {
             this.dim = dim;
-            this.dimNameFamily = dimNameFamily;
-            this.dimUnitFamily = dimUnitFamily;
+            this.dimName = dimName;
+            this.dimUnit = dimUnit;
             this.dimExists = false;
         }
         public void setExists()
@@ -174,8 +185,15 @@ namespace CSProfiles
     public abstract class HSectionCordinateSource : IHSectionCordinate
     {
 	    protected List<HSectionMap> ParametrsMap;
+  
+        public float H { get { return getMapValue(HSectionDim.h); } }
+        public float B { get { return getMapValue(HSectionDim.b); } }
+        public float Tf { get { return getMapValue(HSectionDim.tf); } }
+        public float Tw { get { return getMapValue(HSectionDim.tw); } }
+        public float R { get { return getMapValue(HSectionDim.r); } }
+        public float H1 { get { return H - 2 * Tf - 2 * R; } }
 
-        public void setProfilesProperties(ObservableCollection<ProfileItem> profile)
+        public void SetProfilesProperties(List<ProfileItem> profile)
         {
             #if DEBUG
                 Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -183,60 +201,59 @@ namespace CSProfiles
             procesProfileData(profile);
         }
 
-        private void procesProfileData(ObservableCollection<ProfileItem> profileData)
+        private void procesProfileData(List<ProfileItem> profileData)
         {
             #if DEBUG
                 Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
             #endif
 
             if (ParametrsMap == null) {
-            //  throw new IllegalArgumentException("ParametrsMap == null");
+              throw new ArgumentNullException("ParametrsMap == null");
             }
 		
 		    if(ParametrsMap.Count == 0) {
-            //throw new IllegalArgumentException("ParametrsMap.size() == 0");
+                throw new ArgumentNullException("ParametrsMap.size() == 0");
             }
 
             if (profileData == null)
             {
-                // throw new IllegalArgumentException("profileData == null");
+                 throw new ArgumentNullException("profileData == null");
+            }
+           
+            if(profileData.Count == 0) {
+                throw new ArgumentNullException("profileData.Count == 0");
             }
 
-            // List<ProfileItem> profileParams = profileData.getProfileCharacteristicList();
-            /*
-                if(profileParams.Count == 0) {
-                //throw new IllegalArgumentException("profileParams.size() == 0");
-                }
-
-                for(int a=0; a < ParametrsMap.Count; a++) {
-                    for (int b = 0; b < profileParams.Count; b++)
+            for(int a=0; a < ParametrsMap.Count; a++) {
+                for (int b = 0; b < profileData.Count; b++)
+                {
+                    if (
+                        (ParametrsMap[a].dimName.Equals(profileData[b].paramName)) &&
+                        (ParametrsMap[a].dimUnit.Equals(profileData[b].paramUnit))
+                       )
                     {
-                        if (
-                            (ParametrsMap[a].dimNameFamily.equals(profileParams[b].getParamName())) &&
-                            (ParametrsMap[a].dimUnitFamily.equals(profileParams[b].getParamUnit()))
-                            )
+                        ParametrsMap[a].setExists();
+                        try
                         {
-                            ParametrsMap[a].setExists();
-                             try
-                             {
-                                ParametrsMap[a].dimValue = Float.parseFloat(profileParams[b].getParamValue());
-                             }
-                            catch (NumberFormatException e)
-                            {
-                                //throw new IllegalArgumentException("procesProfileData: getMapValue: " + profileParams.get(b).getParamValue() + " is not a float");
-                            }
-                            break;
+                            ParametrsMap[a].dimValue = Convert.ToSingle(profileData[b].paramValue.Replace(".",","));
+                        }
+                        catch (FormatException)
+                        { 
+                            throw new ArgumentNullException("procesProfileData: getMapValue: " + 
+                                        profileData[b].paramValue + " is not a float");
+                        }
+                        break;
                         }
                     } 
-                }*/
+                }
 
             for (int a=0; a < ParametrsMap.Count; a++) {
             if (ParametrsMap[a].dimExists == false)
-            {
-                //throw new IllegalArgumentException("procesProfileData: map check failed");
+                {
+                throw new ArgumentNullException("map check failed");
+                }
             }
         }
-    }
 
         private float getMapValue(HSectionDim dim)
         {
@@ -249,31 +266,6 @@ namespace CSProfiles
                     return ParametrsMap[a].dimValue;
                 }
             return 0;
-        }
-
-        public float getH()
-        {
-            return getMapValue(HSectionDim.h);
-        }
-        public float getB()
-        {
-            return getMapValue(HSectionDim.b);
-        }
-        public float getTf()
-        {
-            return getMapValue(HSectionDim.tf);
-        }
-        public float getTw()
-        {      
-            return getMapValue(HSectionDim.tw);
-        }
-        public float getR()
-        {
-            return getMapValue(HSectionDim.r);
-        }
-        public float getH1()
-        {
-            return (getH() - 2 * getTf() - 2 * getR());
         }
     }
 
