@@ -16,31 +16,35 @@ using System.Windows.Shapes;
 namespace CSProfiles
 {
     /// <summary>
-    /// Logika interakcji dla klasy MainWindow.xaml
+    /// MainWindows init method
     /// </summary>
     public partial class MainWindow : Window
     {
         Controller MVC;
-
+        
         public MainWindow()
         {
+            #if DEBUG
+                Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
             MVC = new Controller();
             if (!MVC.IsDBActive())
             {
                 MessageBox.Show("Database file doesn't exists.",
-                    Controller.ProgramName + " " + Controller.ProgramVersion.ToString("0.0"),
+                    MVC.GetProgramName(),
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 Application.Current.Shutdown();
             }
 
             InitializeComponent();
+            this.Title = MVC.GetProgramName();
             BindingObj();
-
+            
+            // start load data 
             MVC.LoadProfilesNorme();
-            // autostart 
             if (normeCB.Items.Count>0) { normeCB.SelectedIndex = 0;}
         }
-
+        // binding controls with controlers ObservableCollection
         private void BindingObj()
         {
             normeCB.ItemsSource = MVC.normeList;
@@ -49,8 +53,12 @@ namespace CSProfiles
             paramProfilesLV.ItemsSource = MVC.listViewData;
         }
 
+        // event on controls change
         private void NormeCBChange(object sender, SelectionChangedEventArgs e)
         {
+            #if DEBUG
+                Log.Notice(this.GetType().Name+"."+System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
             ComboBox cmb = sender as ComboBox;
             MVC.LoadProfilesFamily(cmb.SelectedItem as ProfilesNorme);
             if (familyCB.Items.Count>0) { familyCB.SelectedIndex = 0; }
@@ -58,16 +66,49 @@ namespace CSProfiles
 
         private void FamilyCBChange(object sender, SelectionChangedEventArgs e)
         {
+            #if DEBUG
+                Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
             ComboBox cmb = sender as ComboBox;
             MVC.LoadProfilesList(cmb.SelectedItem as ProfilesFamily);
             if (profilesCB.Items.Count > 0) { profilesCB.SelectedIndex = 0; }
             MVC.LoadImage(cmb.SelectedItem as ProfilesFamily, imageSection);
+            DxfGB.IsEnabled = MVC.HasDXFDrawer(cmb.SelectedItem as ProfilesFamily);
         }
 
         private void ProfilesCBChange(object sender, SelectionChangedEventArgs e)
         {
+            #if DEBUG
+                Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
             ComboBox cmb = sender as ComboBox;
             MVC.LoadProfilesData(cmb.SelectedItem as Profiles);
+        }
+
+        private void OpenDxfBtClick(object sender, RoutedEventArgs e)
+        {
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
+            MVC.OpenDXFFile(profilesCB.SelectedItem as Profiles, frontViewChB.IsChecked.Value, 
+                topViewChB.IsChecked.Value, sideViewChB.IsChecked.Value);
+        }
+
+        private void SaveDxfBtClick(object sender, RoutedEventArgs e)
+        {
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
+            MVC.SaveDXFFile(profilesCB.SelectedItem as Profiles, frontViewChB.IsChecked.Value,
+                topViewChB.IsChecked.Value, sideViewChB.IsChecked.Value);
+        }
+
+        private void AppClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, "Closing the app");
+            Log.SaveLog(); ;
+            #endif
         }
     }    
 }

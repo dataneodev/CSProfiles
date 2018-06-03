@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace CSProfiles
 {
-
+    // Object definitions
     public class Profiles
     {
         public int id { get; private set; }
@@ -78,7 +78,7 @@ namespace CSProfiles
             this.code = code;
         }
     }
-
+    // SQLite database class
     sealed public class DBControl {
         public bool IsDatabaseFileExists { get; private set; }
         public String DBPath { get; private set; }
@@ -89,7 +89,7 @@ namespace CSProfiles
             DBPath = GetDBPath(databaseName);
             IsDatabaseFileExists = File.Exists(DBPath) ? true : false;
             DBConnection = ConnectDB();
-            DBConnection.Open();
+            if (IsDatabaseFileExists) { DBConnection.Open(); }
         }
 
         private SQLiteConnection ConnectDB()
@@ -99,27 +99,34 @@ namespace CSProfiles
 
         private String GetDBPath(string DBName)
         {
-            String path = Environment.GetCommandLineArgs()[0];
-            String dir = Path.GetDirectoryName(path);
-
-            if (dir.Contains(Path.DirectorySeparatorChar))
-                if (!dir.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                    dir += Path.DirectorySeparatorChar;
-
-            if (dir.Contains(Path.AltDirectorySeparatorChar))
-                if (!dir.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
-                    dir += Path.AltDirectorySeparatorChar;
-            return dir + DBName;
+            return GKCommon.GetProgramPath() + DBName;
         }
 
         public void GetProfilesNorme(ObservableCollection<ProfilesNorme> listNorme)
         {
-            if (DBConnection == null) throw new NullReferenceException();
-            
+            #if DEBUG
+                Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
+            if (listNorme == null)
+            {
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "listNorme == null"); 
+                #endif
+                return;
+            }
+            listNorme.Clear();
+            if (DBConnection == null)
+            {
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "DBConnection == null");
+                #endif
+                return;
+            }
+
             SQLiteCommand sqlcmd = DBConnection.CreateCommand();
             sqlcmd.CommandText = "SELECT * FROM TNORME";
-
-            listNorme.Clear();
             try
             {
                 SQLiteDataReader dataReader = sqlcmd.ExecuteReader();
@@ -132,6 +139,10 @@ namespace CSProfiles
             catch (SQLiteException e)
             {
                 // log
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "SQL Error: " + e.Message.ToString());
+                #endif
                 listNorme.Clear();
             }
         }
@@ -158,6 +169,10 @@ namespace CSProfiles
             catch (SQLiteException e)
             {
                 // log
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "SQL Error: " + e.Message.ToString());
+                #endif
                 listFamily.Clear();
             }
         }
@@ -183,8 +198,12 @@ namespace CSProfiles
             }
             catch (SQLiteException e)
             {
-                // log
-               profilesList.Clear();
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "SQL Error: " + e.Message.ToString());
+                #endif
+
+                profilesList.Clear();
             }
         }
 
@@ -200,24 +219,33 @@ namespace CSProfiles
             try
             {
                 SQLiteDataReader dataReader = sqlcmd.ExecuteReader();
-                dataReader.Read();
-                String profileParam = dataReader.GetString(1);
-                String[] paramLine = profileParam.Split(';');
-                foreach (String line in paramLine)
+                if (dataReader.Read())
                 {
-                    String[] lineParam = line.Split('=');
-                    if (lineParam.Length != 3)
+                    String profileParam = dataReader.GetString(1);
+                    String[] paramLine = profileParam.Split(';');
+                    foreach (String line in paramLine)
                     {
-                        // log
-                        continue;
+                        if(line.Length == 0) { continue; }
+                        String[] lineParam = line.Split('=');
+                        if (lineParam.Length != 3)
+                        {
+                            #if DEBUG
+                                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                                    "lineParam.Length != 3 : " + line);
+                            #endif
+                            continue;
+                        }
+                        String unit = lineParam[2].Replace("m3", "m\x00B3").Replace("m2", "m\x00B2") ;
+                        listViewData.Add(new ProfileItem(lineParam[0], lineParam[1], unit));
                     }
-                    String unit = lineParam[2].Replace("m3", "m\x00B3").Replace("m2", "m\x00B2");
-                    listViewData.Add(new ProfileItem(lineParam[0], lineParam[1], unit));
                 }
             }
             catch (SQLiteException e)
             {
-                // log
+                #if DEBUG
+                    Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                        "SQL Error: " + e.Message.ToString());
+                #endif
                 listViewData.Clear();
             }
         }
@@ -232,7 +260,7 @@ namespace CSProfiles
             if (selectedFamily.profileImageId == 0) return; 
 
             SQLiteCommand sqlcmd = DBConnection.CreateCommand();
-            sqlcmd.CommandText = "SELECT * FROM TIMAGE WHERE id=" + selectedFamily.profileImageId.ToString();
+            sqlcmd.CommandText = "SELECT * FROM TIMAGE WHERE id=" + selectedFamily.profileImageId.ToString() + " LIMIT 1";
             try
             {
                 SQLiteDataReader dataReader = sqlcmd.ExecuteReader();
@@ -243,8 +271,10 @@ namespace CSProfiles
             }
             catch (SQLiteException e)
             {
-                // log
-               
+                #if DEBUG
+                Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    "SQL Error: " + e.Message.ToString());
+                #endif
             }
         }
 
