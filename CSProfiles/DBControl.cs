@@ -5,6 +5,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -30,18 +31,14 @@ namespace CSProfiles
 
     public class ProfileItem
     {
-        public String paramName { get; private set; }
-        public String paramValue { get; private set; }
-        public String paramUnit { get; private set; }
-        public TextBlock paramUnitTB { get; private set; }
-
-        public ProfileItem(string paramName, string paramValue, string paramUnit, TextBlock paramUnitTB)
-        {
-            this.paramName = paramName;
-            this.paramValue = paramValue;
-            this.paramUnit = paramUnit;
-            this.paramUnitTB = paramUnitTB;
-        }
+        public String paramName { get; set; }
+        public String paramNameNor { get; set; }
+        public String paramNameSup { get; set; }
+        public String paramValue { get; set; }
+        public String paramUnit { get; set; }
+        public String paramUnitNor1 { get; set; }
+        public String paramUnitNor2 { get; set; }
+        public String paramUnitSup { get; set; }
     }
 
     public class ProfilesFamily
@@ -238,11 +235,7 @@ namespace CSProfiles
                             #endif
                             continue;
                         }
-                        String unit = lineParam[2].Replace("m3", "m\x00B3").Replace("m2", "m\x00B2") ;
-                        TextBlock unitTB = new TextBlock();
-                        unitTB.Inlines.Add("test");
-                       // unitTB.Inlines.Add(new System.Windows.Documents.Run("jednostka ") { BaselineAlignment = System.Windows.BaselineAlignment.Superscript });
-                        listViewData.Add(new ProfileItem(lineParam[0], lineParam[1], unit, unitTB));
+                        listViewData.Add(ProfileItemFormat(lineParam[0], lineParam[1], lineParam[2]));
                     }
                 }
             }
@@ -300,6 +293,43 @@ namespace CSProfiles
             }
             image.Freeze();
             return image;
+        }
+
+        private ProfileItem ProfileItemFormat(String Name, String Value, String Unit)
+        {
+            String nameNor = Name;
+            String nameSup = "";
+            if (Name.Length > 0)
+            {
+                if (Name[0] != '(')
+                {
+                    nameNor = Name[0].ToString();
+                    nameSup = Name.Substring(1);
+                } else if (Name.IndexOf(')') != -1)
+                {
+                    nameNor = Name.Substring(0, Name.IndexOf(')')+1);
+                    nameSup = Name.Substring(Name.IndexOf(')')+1);
+                }
+            }
+
+            String unitNor1 = Unit;
+            String unitNor2 = "";
+            String unitSup = "";
+
+            if (Unit.Length > 0)
+            {
+                Match match = Regex.Match(Unit, "m[1-9]");
+                if (match.Success)
+                {
+                    unitNor1 = Unit.Substring(0, match.Index + 1);
+                    unitSup = Unit.Substring(match.Index + 1, 1);
+                    unitNor2 = Unit.Substring(match.Index + 2);
+                }
+            }
+
+            return new ProfileItem() { paramName = Name, paramNameNor = nameNor,
+                        paramNameSup = nameSup, paramValue = Value, paramUnit = Unit,
+                        paramUnitNor1 = unitNor1, paramUnitNor2 = unitNor2, paramUnitSup = unitSup };
         }
 
 

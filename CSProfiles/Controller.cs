@@ -11,7 +11,7 @@ namespace CSProfiles
 {
     class Controller
     {
-        public const String ProgramName = "CJProfiles";
+        public const String ProgramName = "CSProfiles";
         public const float ProgramVersion = 1.0F;
         public const String DBName = "Profile.pdb";
         public const String DXFFileExt = ".dxf";
@@ -170,7 +170,7 @@ namespace CSProfiles
 
             SaveFileDialog savefile = new SaveFileDialog();
             savefile.FileName = selectedProfile.profileName + Controller.DXFFileExt;
-            savefile.Filter = "DXF Files ("+ Controller.DXFFileExt + ")|*" + Controller.DXFFileExt;
+            savefile.Filter = "DXF Files|*" + Controller.DXFFileExt;
 
             if (savefile.ShowDialog() == false)
             {

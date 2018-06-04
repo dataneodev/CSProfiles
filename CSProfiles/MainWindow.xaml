@@ -23,26 +23,36 @@
             <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="60" x:Name="profilesCB" DisplayMemberPath="profileName" SelectionChanged="ProfilesCBChange"/>
         </StackPanel>
         <ListView Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" x:Name="paramProfilesLV">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                    <Setter Property="BorderThickness" Value="0,0,0,1" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView AllowsColumnReorder="False">
                     <GridViewColumn Width="auto" Header="Parametr" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Width="Auto" Text="{Binding paramName}" />
+                                <TextBlock Width="Auto" Padding="0" Margin="0">
+                                    <Run Text="{Binding paramNameNor, Mode=OneWay}"/><Run Text="{Binding paramNameSup, Mode=OneWay}" BaselineAlignment="Subscript"/>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="auto" Header="Value">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock MinWidth="70" Width="Auto" Text="{Binding paramValue}" TextAlignment="Left" />
+                                <TextBlock Text="{Binding paramValue}" Padding="0" Margin="0" MinWidth="70" Width="Auto" TextAlignment="Left"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="auto" Header="Unit">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock MinWidth="40" Width="Auto" Text="{Binding paramUnit}" TextAlignment="Left" />
+                                <TextBlock MinWidth="40" Width="Auto" Padding="0" Margin="0" TextAlignment="Left">
+                                    <Run Text="{Binding paramUnitNor1, Mode=OneWay}"></Run><Run FontSize="8" Text="{Binding paramUnitSup, Mode=OneWay}" BaselineAlignment="Superscript"></Run><Run Text="{Binding paramUnitNor2, Mode=OneWay}"></Run>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
