@@ -109,6 +109,12 @@ namespace CSProfiles
             Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, "Closing the app");
             Log.SaveLog(); ;
             #endif
+            MVC.Endcontroller();
+        }
+
+        private void HomePageClick(object sender, RoutedEventArgs e)
+        {
+           // Updater.OpenHomePage();
         }
     }    
 }

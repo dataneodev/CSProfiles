@@ -250,6 +250,11 @@ namespace CSProfiles
         {
             return ProgramName + " " + ProgramVersion.ToString("0.0").Replace(",", ".");
         }
+
+        public void Endcontroller()
+        {
+            DB.CloseConnection();
+        }
     }
 
 #if DEBUG

@@ -210,7 +210,7 @@ namespace CSProfiles
         public void GetProfilesItems(ObservableCollection<ProfileItem> listViewData, Profiles selectedProfile)
         {
             if (DBConnection == null) throw new NullReferenceException();
-
+            
             listViewData.Clear();
             if (selectedProfile == null) return;
 
@@ -252,7 +252,6 @@ namespace CSProfiles
         public void GetprofilesImage(System.Windows.Controls.Image image, ProfilesFamily selectedFamily)
         {
             if (DBConnection == null) throw new NullReferenceException();
-
             image.Source = null;
 
             if (selectedFamily == null) return;
@@ -332,7 +331,11 @@ namespace CSProfiles
                         paramUnitNor1 = unitNor1, paramUnitNor2 = unitNor2, paramUnitSup = unitSup };
         }
 
-
+        public void CloseConnection()
+        {
+            DBConnection.Close();
+            DBConnection.Dispose();
+        }
 
 
         /*

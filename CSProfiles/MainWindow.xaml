@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CSProfiles"
         mc:Ignorable="d"
         Closing="AppClosing"
-        Title="CSProfiles" HorizontalAlignment="Left" VerticalAlignment="Top" Width="500" Height="500" MinWidth="300" MinHeight="400" WindowStartupLocation="CenterScreen">
+        Title="CSProfiles" HorizontalAlignment="Left" VerticalAlignment="Top" Width="510" Height="500" MinWidth="510" MinHeight="500" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -18,9 +18,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
-            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="70" x:Name="normeCB" DisplayMemberPath="normeName" SelectionChanged="NormeCBChange"/>
-            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="50" x:Name="familyCB" DisplayMemberPath="profileName" SelectionChanged="FamilyCBChange"/>
-            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="60" x:Name="profilesCB" DisplayMemberPath="profileName" SelectionChanged="ProfilesCBChange"/>
+            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="70" ToolTip="Select country group" x:Name="normeCB" DisplayMemberPath="normeName" SelectionChanged="NormeCBChange"/>
+            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="50" ToolTip="Select profiles family" x:Name="familyCB" DisplayMemberPath="profileName" SelectionChanged="FamilyCBChange"/>
+            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="60" ToolTip="Select profile" x:Name="profilesCB" DisplayMemberPath="profileName" SelectionChanged="ProfilesCBChange"/>
         </StackPanel>
         <ListView Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" x:Name="paramProfilesLV">
             <ListView.ItemContainerStyle>
@@ -59,17 +59,18 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <GroupBox x:Name="DxfGB" Grid.Column="2" Grid.Row="3" Header="DXF Options" Margin="0,5,5,5" VerticalContentAlignment="Bottom">
+        <GroupBox x:Name="DxfGB" Grid.Column="2" Grid.Row="3" Header="DXF Options" Margin="5,5,5,5" VerticalContentAlignment="Bottom">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="frontViewChB" Margin="5" IsChecked="True">Front view</CheckBox>
-                    <CheckBox x:Name="topViewChB" Margin="5" IsChecked="True">Top view</CheckBox>
-                    <CheckBox x:Name="sideViewChB" Margin="5" IsChecked="True">Side view</CheckBox>
+                    <CheckBox x:Name="frontViewChB" ToolTip="Front view of profile in dxf file" Margin="5" IsChecked="True">Front view</CheckBox>
+                    <CheckBox x:Name="topViewChB" ToolTip="Top view of profile in dxf file" Margin="5" IsChecked="True">Top view</CheckBox>
+                    <CheckBox x:Name="sideViewChB" ToolTip="Side view of profile in dxf file" Margin="5" IsChecked="True">Side view</CheckBox>
                 </StackPanel>
-                <Button Click="OpenDxfBtClick" Content="Open dxf"  Padding="3" Margin="5"/>
-                <Button Click="SaveDxfBtClick" Content="Save dxf"  Padding="3" Margin="5"/>
+                <Button Click="OpenDxfBtClick" ToolTip="Open dxf file with default associated program" Cursor="Hand" Content="Open dxf"  Padding="3" Margin="5"/>
+                <Button Click="SaveDxfBtClick" ToolTip="Save dxf file" Cursor="Hand" Content="Save dxf"  Padding="3" Margin="5"/>
             </StackPanel>
         </GroupBox>
         <Image Grid.Column="1" Margin="0,5,5,5" Grid.Row="1" x:Name="imageSection"/>
+        <TextBlock Grid.Column="1" Grid.Row="0" x:Name="hompageL" PreviewMouseDown="HomePageClick"  ToolTip="Open home page" Cursor="Hand" Margin="5,5,10,5" TextDecorations="Underline" HorizontalAlignment="Right">Home page</TextBlock>
     </Grid>
 </Window>
