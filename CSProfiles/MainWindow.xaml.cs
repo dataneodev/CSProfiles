@@ -15,13 +15,10 @@ using System.Windows.Shapes;
 
 namespace CSProfiles
 {
-    /// <summary>
-    /// MainWindows init method
-    /// </summary>
     public partial class MainWindow : Window
     {
         Controller MVC;
-        
+        // main start
         public MainWindow()
         {
             #if DEBUG
@@ -43,6 +40,7 @@ namespace CSProfiles
             // start load data 
             MVC.LoadProfilesNorme();
             if (normeCB.Items.Count>0) { normeCB.SelectedIndex = 0;}
+            UpdateChecks();
         }
         // binding controls with controlers ObservableCollection
         private void BindingObj()
@@ -114,7 +112,15 @@ namespace CSProfiles
 
         private void HomePageClick(object sender, RoutedEventArgs e)
         {
-           // Updater.OpenHomePage();
+            Updater.OpenHomePage();
+        }
+
+        private void UpdateChecks()
+        {
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
+            Updater.CheckUpdate(Controller.ProgramVersion, homepageL);
         }
     }    
 }
