@@ -22,7 +22,14 @@
             <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="50" ToolTip="Select profiles family" x:Name="familyCB" DisplayMemberPath="profileName" SelectionChanged="FamilyCBChange"/>
             <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="60" ToolTip="Select profile" x:Name="profilesCB" DisplayMemberPath="profileName" SelectionChanged="ProfilesCBChange"/>
         </StackPanel>
-        <ListView Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" x:Name="paramProfilesLV">
+        <ListView Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" x:Name="paramProfilesLV" ContextMenuOpening="ShowingPopMenu">
+            <ListView.ContextMenu>
+                <ContextMenu x:Name="popMenu">
+                    <MenuItem x:Name="popCopyValue" Click="PopCopyValueClick" Header="Copy value to clipboard"/>
+                    <MenuItem x:Name="popCopyItem" Click="PopCopyItemClick" Header="Copy item to clipboard"/>
+                    <MenuItem x:Name="popCopyAll" Click="PopCopyAllClick" Header="Copy all to clipboard"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="BorderBrush" Value="LightGray" />
@@ -72,5 +79,6 @@
         </GroupBox>
         <Image Grid.Column="1" Margin="0,5,5,5" Grid.Row="1" x:Name="imageSection"/>
         <TextBlock Grid.Column="1" Grid.Row="0" x:Name="homepageL" PreviewMouseDown="HomePageClick"  ToolTip="Open home page" Cursor="Hand" Margin="5,5,10,5" TextDecorations="Underline" HorizontalAlignment="Right">Home page</TextBlock>
+
     </Grid>
 </Window>

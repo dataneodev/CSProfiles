@@ -30,7 +30,7 @@ namespace CSProfiles
 		
 		    if(Cor == null) {
                 #if DEBUG
-                    Log.Warning(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    Log.Error(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
                         "cordinate == null");
                 #endif
                 return "";

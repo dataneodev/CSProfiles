@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CSProfiles
 {
@@ -99,6 +87,61 @@ namespace CSProfiles
             #endif
             MVC.SaveDXFFile(profilesCB.SelectedItem as Profiles, frontViewChB.IsChecked.Value,
                 topViewChB.IsChecked.Value, sideViewChB.IsChecked.Value);
+        }
+
+        private void PopCopyValueClick(object sender, RoutedEventArgs e)
+        {
+            int selId = paramProfilesLV?.SelectedIndex ?? -1;
+            ProfileItem selItem = selId != -1 && MVC.listViewData.Count > selId ? MVC.listViewData[selId] : null;
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, 
+                selItem != null ? selItem.paramValue : "selItem == null");
+            #endif
+            if(selItem != null)
+            {
+                Clipboard.SetText(selItem.paramValue);
+            }
+        }
+
+        private void PopCopyItemClick(object sender, RoutedEventArgs e)
+        {
+            int selId = paramProfilesLV?.SelectedIndex ?? -1;
+            ProfileItem selItem = selId != -1 && MVC.listViewData.Count > selId ? MVC.listViewData[selId] : null;
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name,
+                selItem != null ? selItem.paramName + "=" + selItem.paramValue + selItem.paramUnit : "selItem == null");
+            #endif
+            if(selItem != null)
+            {
+                Clipboard.SetText(selItem.paramName+"="+selItem.paramValue+selItem.paramUnit);
+            }
+        }
+
+        private void PopCopyAllClick(object sender, RoutedEventArgs e)
+        {
+            string clip="";
+            foreach(ProfileItem item in MVC.listViewData)
+            {
+                clip += item.paramName + "=" + item.paramValue + item.paramUnit + System.Environment.NewLine;
+            }
+            Clipboard.SetText(clip);
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, clip);
+            #endif
+        }
+
+        private void ShowingPopMenu(object sender, ContextMenuEventArgs e)
+        {
+            #if DEBUG
+            Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
+            #endif
+            int selId = paramProfilesLV?.SelectedIndex ?? -1;
+            ProfileItem selItem = selId != -1 && MVC.listViewData.Count > selId ? MVC.listViewData[selId] : null;
+            if(selItem != null)
+            {
+                popCopyValue.Header = "Copy value to clipboard ["+selItem.paramValue+"]";
+                popCopyItem.Header = "Copy row to clipboard ["+selItem.paramName+"="+selItem.paramValue+selItem.paramUnit+"]";
+            }
         }
 
         private void AppClosing(object sender, System.ComponentModel.CancelEventArgs e)

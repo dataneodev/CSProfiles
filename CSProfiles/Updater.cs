@@ -174,7 +174,7 @@ namespace CSProfiles
                 return;
             }
 
-            if (IsNewVersion())
+            if (IsNewVersion() && (label != null))
             {
                 label.Text = "New version avilable !";
                 label.FontWeight = FontWeights.Bold;
