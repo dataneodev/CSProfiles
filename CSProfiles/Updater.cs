@@ -152,8 +152,7 @@ namespace CSProfiles
 
             try
             {
-                float outVersion;
-                if(!float.TryParse(nodes[0].SelectSingleNode("Version").InnerText.Replace(".",","), out outVersion))
+                if (!float.TryParse(nodes[0].SelectSingleNode("Version").InnerText.Replace(".", ","), out float outVersion))
                 {
                     #if DEBUG
                     Log.Error(System.Reflection.MethodBase.GetCurrentMethod().Name,

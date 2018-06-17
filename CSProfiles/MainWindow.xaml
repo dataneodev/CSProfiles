@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:CSProfiles"
         mc:Ignorable="d"
         Closing="AppClosing"
-        Title="CSProfiles" HorizontalAlignment="Left" VerticalAlignment="Top" Width="510" Height="500" MinWidth="510" MinHeight="500" WindowStartupLocation="CenterScreen">
-    <Grid>
+        Title="CSProfiles" HorizontalAlignment="Left" VerticalAlignment="Top" Width="510" Height="550" MinWidth="510" MinHeight="550" WindowStartupLocation="CenterScreen">
+    <Grid Margin="0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="1*" />
@@ -17,11 +17,14 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
-            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="70" ToolTip="Select country group" x:Name="normeCB" DisplayMemberPath="normeName" SelectionChanged="NormeCBChange"/>
-            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="50" ToolTip="Select profiles family" x:Name="familyCB" DisplayMemberPath="profileName" SelectionChanged="FamilyCBChange"/>
-            <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="60" ToolTip="Select profile" x:Name="profilesCB" DisplayMemberPath="profileName" SelectionChanged="ProfilesCBChange"/>
-        </StackPanel>
+        <DockPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="70" ToolTip="Select country group" x:Name="normeCB" DisplayMemberPath="normeName" SelectionChanged="NormeCBChange"/>
+                <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="50" ToolTip="Select profiles family" x:Name="familyCB" DisplayMemberPath="profileName" SelectionChanged="FamilyCBChange"/>
+                <ComboBox Margin="5" Padding="4" VerticalAlignment="Top" MinWidth="60" ToolTip="Select profile" x:Name="profilesCB" DisplayMemberPath="profileName" SelectionChanged="ProfilesCBChange"/>
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Right" x:Name="homepageL" PreviewMouseDown="HomePageClick"  ToolTip="Open home page" Cursor="Hand" Margin="5,5,10,5" TextDecorations="Underline" HorizontalAlignment="Right">Home page</TextBlock>
+        </DockPanel>
         <ListView Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" x:Name="paramProfilesLV" ContextMenuOpening="ShowingPopMenu">
             <ListView.ContextMenu>
                 <ContextMenu x:Name="popMenu">
@@ -41,7 +44,7 @@
                     <GridViewColumn Width="auto" Header="Parametr" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Width="Auto" Padding="0" Margin="0">
+                                <TextBlock ToolTip="{Binding paramDesc}" Width="Auto" Padding="0" Margin="0">
                                     <Run Text="{Binding paramNameNor, Mode=OneWay}"/><Run Text="{Binding paramNameSup, Mode=OneWay}" BaselineAlignment="Subscript"/>
                                 </TextBlock>
                             </DataTemplate>
@@ -50,14 +53,16 @@
                     <GridViewColumn Width="auto" Header="Value">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding paramValue}" Padding="0" Margin="0" MinWidth="70" Width="Auto" TextAlignment="Left"/>
+                                <TextBlock Padding="0" Margin="0" ToolTip="{Binding paramDesc}" MinWidth="55" Width="Auto" TextAlignment="Left">
+                                     <Run Text="{Binding paramValueNor, Mode=OneWay}"/><Run Text="{Binding paramValueSup, Mode=OneWay}" BaselineAlignment="Subscript"/>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="auto" Header="Unit">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock MinWidth="40" Width="Auto" Padding="0" Margin="0" TextAlignment="Left">
+                                <TextBlock ToolTip="{Binding paramDesc}" MinWidth="30" Width="Auto" Padding="0" Margin="0" TextAlignment="Left">
                                     <Run Text="{Binding paramUnitNor1, Mode=OneWay}"></Run><Run FontSize="8" Text="{Binding paramUnitSup, Mode=OneWay}" BaselineAlignment="Superscript"></Run><Run Text="{Binding paramUnitNor2, Mode=OneWay}"></Run>
                                 </TextBlock>
                             </DataTemplate>
@@ -77,8 +82,11 @@
                 <Button Click="SaveDxfBtClick" ToolTip="Save dxf file" Cursor="Hand" Content="Save dxf"  Padding="3" Margin="5"/>
             </StackPanel>
         </GroupBox>
-        <Image Grid.Column="1" Margin="0,5,5,5" Grid.Row="1" x:Name="imageSection"/>
-        <TextBlock Grid.Column="1" Grid.Row="0" x:Name="homepageL" PreviewMouseDown="HomePageClick"  ToolTip="Open home page" Cursor="Hand" Margin="5,5,10,5" TextDecorations="Underline" HorizontalAlignment="Right">Home page</TextBlock>
-
+        <DockPanel Grid.Column="1" Grid.Row="1">
+            <TextBlock DockPanel.Dock="Top" x:Name="familiDescTB" Margin="5,0,5,0" TextWrapping="Wrap"/>
+            <Image DockPanel.Dock="Bottom" Margin="0" x:Name="imageSection"/>
+        </DockPanel>
+        
+        
     </Grid>
 </Window>

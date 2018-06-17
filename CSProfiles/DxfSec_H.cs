@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSProfiles
 {
@@ -138,12 +134,14 @@ namespace CSProfiles
             #if DEBUG
                 Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
             #endif
-            ParametrsMap = new List<HSectionMap>();
-            ParametrsMap.Add(new HSectionMap(HSectionDim.h, "h", "mm"));
-            ParametrsMap.Add(new HSectionMap(HSectionDim.b, "b", "mm"));
-            ParametrsMap.Add(new HSectionMap(HSectionDim.tf, "tg", "mm"));
-            ParametrsMap.Add(new HSectionMap(HSectionDim.tw, "ts", "mm"));
-            ParametrsMap.Add(new HSectionMap(HSectionDim.r, "r", "mm"));
+            ParametrsMap = new List<HSectionMap>
+            {
+                new HSectionMap(HSectionDim.h, "h", "mm"),
+                new HSectionMap(HSectionDim.b, "b", "mm"),
+                new HSectionMap(HSectionDim.tf, "tg", "mm"),
+                new HSectionMap(HSectionDim.tw, "ts", "mm"),
+                new HSectionMap(HSectionDim.r, "r", "mm")
+            };
         }
     }
 
@@ -198,10 +196,10 @@ namespace CSProfiles
             #if DEBUG
                 Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
             #endif
-            procesProfileData(profile);
+            ProcesProfileData(profile);
         }
 
-        private void procesProfileData(List<ProfileItem> profileData)
+        private void ProcesProfileData(List<ProfileItem> profileData)
         {
             #if DEBUG
                 Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -242,10 +240,10 @@ namespace CSProfiles
                             throw new ArgumentNullException("procesProfileData: getMapValue: " + 
                                         profileData[b].paramValue + " is not a float");
                         }
-                        break;
-                        }
-                    } 
-                }
+                    break;
+                    }
+                } 
+            }
 
             for (int a=0; a < ParametrsMap.Count; a++) {
             if (ParametrsMap[a].dimExists == false)

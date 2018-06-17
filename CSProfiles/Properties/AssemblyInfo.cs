@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("CSProfiles")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("dataneo")]
 [assembly: AssemblyProduct("CSProfiles")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright © 2018 dataneo")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

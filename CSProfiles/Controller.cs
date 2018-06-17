@@ -168,9 +168,11 @@ namespace CSProfiles
                 return;
             }
 
-            SaveFileDialog savefile = new SaveFileDialog();
-            savefile.FileName = selectedProfile.profileName + Controller.DXFFileExt;
-            savefile.Filter = "DXF Files|*" + Controller.DXFFileExt;
+            SaveFileDialog savefile = new SaveFileDialog
+            {
+                FileName = selectedProfile.profileName + Controller.DXFFileExt,
+                Filter = "DXF Files|*" + Controller.DXFFileExt
+            };
 
             if (savefile.ShowDialog() == false)
             {

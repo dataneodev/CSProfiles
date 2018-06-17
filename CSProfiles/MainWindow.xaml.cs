@@ -56,10 +56,12 @@ namespace CSProfiles
                 Log.Notice(this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name);
             #endif
             ComboBox cmb = sender as ComboBox;
-            MVC.LoadProfilesList(cmb.SelectedItem as ProfilesFamily);
+            ProfilesFamily ActiveFamily = cmb?.SelectedItem as ProfilesFamily;
+            MVC.LoadProfilesList(ActiveFamily);
             if (profilesCB.Items.Count > 0) { profilesCB.SelectedIndex = 0; }
-            MVC.LoadImage(cmb.SelectedItem as ProfilesFamily, imageSection);
+            MVC.LoadImage(ActiveFamily, imageSection);
             DxfGB.IsEnabled = MVC.HasDXFDrawer(cmb.SelectedItem as ProfilesFamily);
+            familiDescTB.Text = ActiveFamily?.descryption ?? "";
         }
 
         private void ProfilesCBChange(object sender, SelectionChangedEventArgs e)
